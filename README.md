@@ -4,19 +4,21 @@
 
 This is a very basic implementation of a 3D modelling and rendering system.
 
-The Python module is used for creating 3D models and basic visualization of the 3D models made, and to export it to be used by the WebGL rendering module.
+The entire system is divided in 2 sub-systems: 3D modelling sub-system and rendering sub-system.
 
-The exported 3D model is used in `webgl.html` and rendered using WebGL library for web browsers. This is used as it requires no installation (already built-in in most modern day browsers) while still exposing core graphics functionality such as transformations, lighting and shader coding.
+Python module is used for creating the 3D modelling sub-system, which creates 3D models and provides basic visualization of those models, and exports it to be used by the rendering sub-system.
 
-3D model is exported as an array of vertices, indices referring to those vertices, and colors assigned to those vertices in a .js format to be used as variables in the `webgl.html` page.
+WebGL graphics library is used in the rendering sub-system to render the exported 3D model in web browsers. This is used as it requires no installation (already built-in in most modern day browsers) while still exposing core graphics functionality such as transformations, lighting and shader coding.
+
+3D model is exported as an array of vertices, indices referring to those vertices, and colors assigned to those vertices in a js format to be used as variables in the `webgl.html` page.
 
 ## Installation and running
 
-The python module of this program was written in `Python 3.7.4`, using tkinter library for creating the UI. This already comes in-built with most python installations.
+The python module of this program was written in `Python 3.7.4`, using tkinter library for creating the UI. This already comes built-in with python 3 installations.
 
-WebGL is used for rendering the exported 3D model on the web browser, which comes in-built and is supported by most major browsers. [Click here](https://get.webgl.org/) to see if your browser supports WebGL or not.
+WebGL is used for rendering the exported 3D model on the web browser, which is supported by most major browsers and comes in-built. [Click here](https://get.webgl.org/) to see if your browser supports WebGL or not.
 
-To run the program, first run `python main.py` to create the 3D model. After creating the model, select it (selected model will appear as red), and press Export to export it in js format to be used by webgl module.
+To run the program, first run `python main.py` to create the 3D model. After creating the model, select it (selected model will appear as red), and press Export to export it in js format to be used by rendering module.
 
 Then, open `webgl.html` page using a web browser which supports WebGL, to see the 3D model rendered live.
 
@@ -30,12 +32,18 @@ Then, open `webgl.html` page using a web browser which supports WebGL, to see th
 - **ui.py** : implements the UI used for the 3D modelling sub-system.
 - **main.py** : starting point for running the 3D modelling sub-system.
 - **model.js** : the exported 3D model used in `webgl.html`.
-- **webgl.html** : HTML page used to render the 3D model using WebGL library.
+- **webgl.html** : HTML page used to render the 3D model using WebGL library. This is currently the only file used in the rendering sub-system.
 
 ## TO DO
 
-- Implement rotation transformation.
-- Correctly use the u, v, n vectors used in projection matrix.
-- Implement visible surface detection algorithms to clip models and dislay only those parts which are in front.
-- Improve the UI to incorporate model transformation, model editing and render options.
-- Separate code files for vertex and fragment shaders.
+1. 3D modelling sub-system
+   - Implement rotation transformation.
+   - Correctly use the u, v, n vectors used in projection matrix.
+   - Implement visible surface detection algorithms to clip models and display only those parts which are in front.
+   - Improve the UI to incorporate model properties, model transformation and model editing options.
+   - Add lights and export them in correct format.
+   - Implement rendering algorithm.
+2. Rendering sub-system
+   - Separate code files for vertex and fragment shaders.
+   - Support for multiple objects.
+   - Implement lighting and shadow.
