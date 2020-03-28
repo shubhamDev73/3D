@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#rendering-canvas{
+	border: 1px solid red;
+}
+</style>
+<script type="text/javascript" src="model.js"></script>
+</head>
+<body>
+<canvas id = "rendering-canvas" width = "512" height = "512"></canvas>
+<script type="text/javascript">
+	// Step 1 - getting essentials
+	var canvas = document.getElementById("rendering-canvas");
+	var gl = canvas.getContext('webgl');
+
+	// Step 2 - creating geometry
+	// vertices, indices, colors arrays read from model.js
+	var vertex_buffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+	var index_buffer = gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+	var color_buffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+	// Step 3 - creating shaders
+	// vertex shader is applied to vertices
+	var vertCode = 'attribute vec3 coordinates;' + 
+		'attribute vec4 colors;' + 
+		'varying vec4 vColor;' + 
+		'void main(void) {' + 
+			'gl_Position = vec4(coordinates, 1.0);' + 
+			'vColor = colors;' + 
+		'}';
+	var vertShader = gl.createShader(gl.VERTEX_SHADER);
+	gl.shaderSource(vertShader, vertCode);
+	gl.compileShader(vertShader);
+
+	// fragment shader is applied to pixels on surfaces
+	var fragCode = 'precision mediump float;'+
+		'varying vec4 vColor;'+
+		'void main(void) {'+
+			'gl_FragColor = vColor;'+
+		'}';
+	var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+	gl.shaderSource(fragShader, fragCode);
+	gl.compileShader(fragShader);
+
+	// combined shader program
+	var shaderProgram = gl.createProgram();
+	gl.attachShader(shaderProgram, vertShader);
+	gl.attachShader(shaderProgram, fragShader);
+	gl.linkProgram(shaderProgram);
+	gl.useProgram(shaderProgram);
+
+	// Step 4 - associate shader programs to buffer objects
+	gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+	var coord = gl.getAttribLocation(shaderProgram, "coordinates");
+	gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(coord);
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
+	var col = gl.getAttribLocation(shaderProgram, "colors");
+	gl.vertexAttribPointer(col, 4, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(col);
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+	// Step 5 - drawing
+	gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+	gl.clearColor(1.0, 1.0, 1.0, 1.0);
+	gl.enable(gl.DEPTH_TEST);
+	// clearing color buffer bit (else, may cause flickering)
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	gl.viewport(0, 0, canvas.width, canvas.height);
+
+	// draw the triangle
+	gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+</script>
+</body>
+</html>
