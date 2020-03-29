@@ -2,6 +2,10 @@ import render as r
 import tkinter as tk
 from tkinter import filedialog, colorchooser
 
+viewportSize = 512
+selectedColor = "red"
+defaultColor = "black"
+
 master = tk.Tk()
 canvas = None
 
@@ -10,7 +14,7 @@ def keyPress(event):
 
 def setup():
 	global canvas
-	canvas = tk.Canvas(master, width=r.viewportSize, height=r.viewportSize)
+	canvas = tk.Canvas(master, width=viewportSize, height=viewportSize)
 	canvas.bind('<Key>', keyPress)
 	canvas.bind('<Button-1>', r.select)
 	canvas.pack()

@@ -1,11 +1,8 @@
-import structs
+import structs, ui
 
-polygons = []
 selected = None
-worldSize = 5
-viewportSize = 512
-selectedColor = "red"
-defaultColor = "black"
+
+triangles = []
 scene = None
 canvas = None
 
@@ -16,10 +13,10 @@ def render(_scene, _canvas):
 	canvas.delete("all")
 	camera = scene.getCamera()
 	min_window = structs.vector(0, 0)
-	max_window = structs.vector(worldSize, worldSize)
-	min_viewport = structs.vector(0, viewportSize)
-	max_viewport = structs.vector(viewportSize, 0)
-	polygons.clear()
+	max_window = structs.vector(scene.getWorldSize(), scene.getWorldSize())
+	min_viewport = structs.vector(0, ui.viewportSize)
+	max_viewport = structs.vector(ui.viewportSize, 0)
+	triangles.clear()
 	for model in scene.getModels():
 		for face in model.getFaces():
 			v0 = model.getVertex(face[0])
@@ -31,10 +28,10 @@ def render(_scene, _canvas):
 			v0 = getViewportCoordinates(v0, min_window, max_window, min_viewport, max_viewport)
 			v1 = getViewportCoordinates(v1, min_window, max_window, min_viewport, max_viewport)
 			v2 = getViewportCoordinates(v2, min_window, max_window, min_viewport, max_viewport)
-			canvas.create_line(v0.get(0), v0.get(1), v1.get(0), v1.get(1), fill=selectedColor if selected is model else defaultColor)
-			canvas.create_line(v1.get(0), v1.get(1), v2.get(0), v2.get(1), fill=selectedColor if selected is model else defaultColor)
-			# canvas.create_line(v2.get(0), v2.get(1), v0.get(0), v0.get(1), fill=selectedColor if selected is model else defaultColor)
-			polygons.append((v0, v1, v2, model))
+			canvas.create_line(v0.get(0), v0.get(1), v1.get(0), v1.get(1), fill=ui.selectedColor if selected is model else ui.defaultColor)
+			canvas.create_line(v1.get(0), v1.get(1), v2.get(0), v2.get(1), fill=ui.selectedColor if selected is model else ui.defaultColor)
+			# canvas.create_line(v2.get(0), v2.get(1), v0.get(0), v0.get(1), fill=ui.selectedColor if selected is model else ui.defaultColor)
+			triangles.append((v0, v1, v2, model))
 
 def getWorldCoordinates(modelCoordinates, model):
 	position = model.getPosition()
@@ -98,7 +95,7 @@ def select(event):
 	global selected
 	selected = None
 	clickPoint = structs.vector(event.x, event.y)
-	for v0, v1, v2, model in polygons:
+	for v0, v1, v2, model in triangles:
 		if sameSide(v0, v1, v2, clickPoint) and sameSide(v1, v2, v0, clickPoint) and sameSide(v2, v0, v1, clickPoint):
 			selected = model
 			break
@@ -117,13 +114,13 @@ def export(file):
 	vertices = []
 	indices = []
 	colors = []
-	count = 0
+	index = 0
 	for face in model.getFaces():
-		for index in face:
-			vertices += structs.translate(t * getWorldCoordinates(model.getVertex(index), model) / worldSize, -1, -1).toList()
-			indices.append(count)
-			colors += list(model.getMaterial((int)(count / 3)))
-			count += 1
+		for vertex in face:
+			vertices += structs.translate(t * getWorldCoordinates(model.getVertex(vertex), model) / scene.getWorldSize(), -1, -1).toList()
+			indices.append(index)
+			colors += list(model.getMaterial((int)(index / 3)))
+			index += 1
 	f = open(file, "w")
 	f.write("var vertices = {};\n".format(str(vertices)))
 	f.write("var indices = {};\n".format(str(indices)))
