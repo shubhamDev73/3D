@@ -20,32 +20,31 @@ def setup():
 	style = Style()
 	style.configure("TButton", foreground="red", background="white")
 	style.configure("TEntry", foreground="red", background="white")
+	style.configure("TMenubutton", foreground="red", background="white")
 
 	# menu
 	menuBar = Menu(root)
+
 	fileMenu = Menu(menuBar, tearoff=0)
 	fileMenu.add_command(label="New", command=None)
 	fileMenu.add_command(label="Open", command=None)
 	fileMenu.add_command(label="Save", command=None)
 	fileMenu.add_command(label="Save as...", command=None)
 	fileMenu.add_command(label="Close", command=None)
-
 	fileMenu.add_separator()
-
 	fileMenu.add_command(label="Exit", command=root.quit)
 	menuBar.add_cascade(label="File", menu=fileMenu)
+
 	editMenu = Menu(menuBar, tearoff=0)
 	editMenu.add_command(label="Undo", command=None)
-
 	editMenu.add_separator()
-
 	editMenu.add_command(label="Cut", command=None)
 	editMenu.add_command(label="Copy", command=None)
 	editMenu.add_command(label="Paste", command=None)
 	editMenu.add_command(label="Delete", command=None)
 	editMenu.add_command(label="Select All", command=None)
-
 	menuBar.add_cascade(label="Edit", menu=editMenu)
+
 	helpMenu = Menu(menuBar, tearoff=0)
 	helpMenu.add_command(label="Help Index", command=None)
 	helpMenu.add_command(label="About...", command=None)
@@ -66,8 +65,20 @@ def setup():
 	canvas.bind('<Button-1>', r.select)
 	canvas.pack()
 
-	# creating menu bar
-	Button(optionsBar, text="Add", command=add).pack(side="left")
+	# creating options bar
+
+	# add menu
+	addMenubutton = Menubutton(optionsBar, text="Add")
+	addMenu = Menu(addMenubutton, tearoff=0)
+	addMenu.add_command(label="Cube")
+	addMenu.add_command(label="Sphere")
+	addMenu.add_command(label="Cylinder")
+	addMenu.add_separator()
+	addMenu.add_command(label="Light")
+	addMenubutton['menu'] = addMenu
+	addMenubutton.pack(side="left")
+
+	# other options
 	Button(optionsBar, text="Edit", command=edit).pack(side="left")
 	Button(optionsBar, text="Export", command=export).pack(side="left")
 	Button(optionsBar, text="Render", command=None).pack(side="left")
@@ -142,14 +153,6 @@ def export():
 # color = colorchooser.askcolor()
 def draw_line(point1, point2, selected=False):
 	canvas.create_line(point1.get(0), point1.get(1), point2.get(0), point2.get(1), fill=selectedColor if selected else defaultColor)
-
-def add():
-	lis = Listbox(optionsBar)
-	lis.insert(0, "Cube")
-	lis.insert(1, "Cube")
-	lis.insert(2, "Sphere")
-	lis.insert(3, "Cylinder")
-	lis.pack()
 
 def edit():
 	if r.selected is None:
