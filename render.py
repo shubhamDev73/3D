@@ -33,9 +33,10 @@ def render(_scene):
 
 def getWorldCoordinates(modelCoordinates, model):
 	position = model.getPosition()
-	# TODO: implement rotation, scale
+	# TODO: implement rotation
 	rotation = model.getRotation()
-	return structs.translate(modelCoordinates, position.get(0), position.get(1), position.get(2))
+	scale = model.getScale()
+	return structs.translate(structs.scale(modelCoordinates, scale.get(0), scale.get(1), scale.get(2)), position.get(0), position.get(1), position.get(2))
 
 def getViewCoordinates(worldCoordinates, camera):
 	position = camera.getPosition()

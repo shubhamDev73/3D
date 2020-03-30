@@ -35,14 +35,14 @@ class model(object):
 	def cube(cls, name="Cube", position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0), material=(0.5, 0.5, 0.5, 1.0), size=1.0):
 		cube = cls(name, position, rotation, material)
 
-		cube.createVertex(structs.vector(0.0, 0.0, 0.0))
-		cube.createVertex(structs.vector(size, 0.0, 0.0))
-		cube.createVertex(structs.vector(size, size, 0.0))
-		cube.createVertex(structs.vector(0.0, size, 0.0))
-		cube.createVertex(structs.vector(0.0, 0.0, size))
-		cube.createVertex(structs.vector(size, 0.0, size))
-		cube.createVertex(structs.vector(size, size, size))
-		cube.createVertex(structs.vector(0.0, size, size))
+		cube.createVertex(structs.vector(-size/2, -size/2, -size/2))
+		cube.createVertex(structs.vector(size/2, -size/2, -size/2))
+		cube.createVertex(structs.vector(size/2, size/2, -size/2))
+		cube.createVertex(structs.vector(-size/2, size/2, -size/2))
+		cube.createVertex(structs.vector(-size/2, -size/2, size/2))
+		cube.createVertex(structs.vector(size/2, -size/2, size/2))
+		cube.createVertex(structs.vector(size/2, size/2, size/2))
+		cube.createVertex(structs.vector(-size/2, size/2, size/2))
 
 		cube.createFace(3, 2, 1, 0)
 		cube.createFace(0, 1, 5, 4)
