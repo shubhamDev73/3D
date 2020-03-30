@@ -6,7 +6,7 @@ triangles = []
 scene = None
 
 def render(_scene):
-	global scene
+	global scene, triangles
 	scene = _scene
 	camera = scene.getCamera()
 	min_window = structs.vector(0, 0)
@@ -14,7 +14,7 @@ def render(_scene):
 	min_viewport = structs.vector(0, ui.viewportSize)
 	max_viewport = structs.vector(ui.viewportSize, 0)
 	ui.clear()
-	triangles.clear()
+	triangles = []
 	for model in scene.getModels():
 		for face in model.getFaces():
 			v0 = model.getVertex(face[0])
@@ -33,7 +33,7 @@ def render(_scene):
 
 def getWorldCoordinates(modelCoordinates, model):
 	position = model.getPosition()
-	# TODO: implement rotation
+	# TODO: implement rotation, scale
 	rotation = model.getRotation()
 	return structs.translate(modelCoordinates, position.get(0), position.get(1), position.get(2))
 

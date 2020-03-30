@@ -1,6 +1,6 @@
 import structs
 
-class object(object):
+class object:
 
 	def __init__(self, name="", position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0)):
 		self._name = name
@@ -17,14 +17,14 @@ class object(object):
 	def getScale(self):
 		return self._scale
 
-	def translate(self, x=0.0, y=0.0, z=0.0):
-		self._position.translate(x, y, z)
+	def setPosition(self, x=0.0, y=0.0, z=0.0):
+		self._position = structs.vector(x, y, z)
 
-	def rotate(self, angle, axis):
-		self._rotation.rotate(angle, axis)
+	def setRotation(self, x=0.0, y=0.0, z=0.0):
+		self._rotation = structs.vector(x, y, z)
 
-	def scale(self, x=1.0, y=1.0, z=1.0):
-		self._scale.scale(x, y, z)
+	def setScale(self, x=1.0, y=1.0, z=1.0):
+		self._scale = structs.vector(x, y, z)
 
 	def __str__(self):
 		return self._name
@@ -32,8 +32,8 @@ class object(object):
 class model(object):
 
 	@classmethod
-	def cube(cls, position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0), material=(0.5, 0.5, 0.5, 1.0), size=1.0):
-		cube = model("Cube", position, rotation, material)
+	def cube(cls, name="Cube", position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0), material=(0.5, 0.5, 0.5, 1.0), size=1.0):
+		cube = cls(name, position, rotation, material)
 
 		cube.createVertex(structs.vector(0.0, 0.0, 0.0))
 		cube.createVertex(structs.vector(size, 0.0, 0.0))
