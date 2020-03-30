@@ -9,6 +9,6 @@ camera.translate(0, -2, 0)
 cube = m.model.cube(size=1)
 scene.addModel(cube)
 cube.translate(1, 0, 1)
-r.render(scene, ui.canvas)
+r.render(scene)
 
 ui.start()

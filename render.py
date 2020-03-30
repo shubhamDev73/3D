@@ -4,13 +4,10 @@ selected = None
 
 triangles = []
 scene = None
-canvas = None
 
-def render(_scene, _canvas):
-	global scene, canvas
+def render(_scene):
+	global scene
 	scene = _scene
-	canvas = _canvas
-	canvas.delete("all")
 	camera = scene.getCamera()
 	min_window = structs.vector(0, 0)
 	max_window = structs.vector(scene.getWorldSize(), scene.getWorldSize())
@@ -28,9 +25,9 @@ def render(_scene, _canvas):
 			v0 = getViewportCoordinates(v0, min_window, max_window, min_viewport, max_viewport)
 			v1 = getViewportCoordinates(v1, min_window, max_window, min_viewport, max_viewport)
 			v2 = getViewportCoordinates(v2, min_window, max_window, min_viewport, max_viewport)
-			canvas.create_line(v0.get(0), v0.get(1), v1.get(0), v1.get(1), fill=ui.selectedColor if selected is model else ui.defaultColor)
-			canvas.create_line(v1.get(0), v1.get(1), v2.get(0), v2.get(1), fill=ui.selectedColor if selected is model else ui.defaultColor)
-			# canvas.create_line(v2.get(0), v2.get(1), v0.get(0), v0.get(1), fill=ui.selectedColor if selected is model else ui.defaultColor)
+			ui.draw_line(v0, v1, selected is model)
+			ui.draw_line(v1, v2, selected is model)
+			# ui.draw_line(v2, v0, selected is model)
 			triangles.append((v0, v1, v2, model))
 
 def getWorldCoordinates(modelCoordinates, model):
@@ -99,7 +96,7 @@ def select(event):
 		if sameSide(v0, v1, v2, clickPoint) and sameSide(v1, v2, v0, clickPoint) and sameSide(v2, v0, v1, clickPoint):
 			selected = model
 			break
-	render(scene, canvas)
+	render(scene)
 
 def export(file):
 	model = selected
