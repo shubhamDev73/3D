@@ -1,4 +1,4 @@
-import structs, model as m, render as r
+import structs, model as m, render as r, main
 
 from tkinter import *
 from tkinter.ttk import *
@@ -9,6 +9,7 @@ selectedColor = "red"
 defaultColor = "black"
 
 def setup():
+	
 	""" Setting up the UI to be used """
 
 	# creating global variables as they are used by other functions too
@@ -68,11 +69,11 @@ def setup():
 	# creating options bar
 
 	# add menu
+	objects = [func for func in dir(m.model) if type(getattr(m.model, func)) is type(m.model.cube)]
 	addMenubutton = Menubutton(optionsBar, text="Add")
 	addMenu = Menu(addMenubutton, tearoff=0)
-	addMenu.add_command(label="Cube")
-	addMenu.add_command(label="Sphere")
-	addMenu.add_command(label="Cylinder")
+	for obj in objects:
+		addMenu.add_command(label=obj.capitalize(), command=lambda : add(obj))
 	addMenu.add_separator()
 	addMenu.add_command(label="Light")
 	addMenubutton['menu'] = addMenu
@@ -157,3 +158,8 @@ def draw_line(point1, point2, selected=False):
 def edit():
 	if r.selected is None:
 		return
+
+def add(obj):
+	model = getattr(m.model, obj)()
+	main.scene.addModel(model)
+	r.render(main.scene)

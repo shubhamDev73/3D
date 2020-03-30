@@ -13,6 +13,7 @@ def render(_scene):
 	max_window = structs.vector(scene.getWorldSize(), scene.getWorldSize())
 	min_viewport = structs.vector(0, ui.viewportSize)
 	max_viewport = structs.vector(ui.viewportSize, 0)
+	ui.clear()
 	triangles.clear()
 	for model in scene.getModels():
 		for face in model.getFaces():
