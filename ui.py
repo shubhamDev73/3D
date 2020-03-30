@@ -11,6 +11,11 @@ defaultColor = "black"
 def setup():
 	""" Setting up the UI to be used """
 
+	# configuring UI style
+	style = Style()
+	style.configure("TButton", foreground="red", background="white")
+	style.configure("TEntry", foreground="red", background="white")
+
 	# creating global variables as they are used by other functions too
 	global root, canvas, menuBar, propertiesBar
 
