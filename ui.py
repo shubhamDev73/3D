@@ -12,7 +12,7 @@ def setup():
 	""" Setting up the UI to be used """
 
 	# creating global variables as they are used by other functions too
-	global root, canvas, menuBar, propertiesBar
+	global root, canvas, optionsBar, propertiesBar
 
 	root = Tk()
 
@@ -21,9 +21,41 @@ def setup():
 	style.configure("TButton", foreground="red", background="white")
 	style.configure("TEntry", foreground="red", background="white")
 
+	# menu
+	menuBar = Menu(root)
+	filemenu = Menu(menuBar, tearoff=0)
+	filemenu.add_command(label="New", command=edit)
+	filemenu.add_command(label="Open", command=edit)
+	filemenu.add_command(label="Save", command=edit)
+	filemenu.add_command(label="Save as...", command=edit)
+	filemenu.add_command(label="Close", command=edit)
+
+	filemenu.add_separator()
+
+	filemenu.add_command(label="Exit", command=root.quit)
+	menuBar.add_cascade(label="File", menu=filemenu)
+	editmenu = Menu(menuBar, tearoff=0)
+	editmenu.add_command(label="Undo", command=edit)
+
+	editmenu.add_separator()
+
+	editmenu.add_command(label="Cut", command=edit)
+	editmenu.add_command(label="Copy", command=edit)
+	editmenu.add_command(label="Paste", command=edit)
+	editmenu.add_command(label="Delete", command=edit)
+	editmenu.add_command(label="Select All", command=edit)
+
+	menuBar.add_cascade(label="Edit", menu=editmenu)
+	helpmenu = Menu(menuBar, tearoff=0)
+	helpmenu.add_command(label="Help Index", command=edit)
+	helpmenu.add_command(label="About...", command=edit)
+	menuBar.add_cascade(label="Help", menu=helpmenu)
+
+	root.config(menu=menuBar)
+
 	# different frames
-	menuBar = Frame(root)
-	menuBar.pack(side="top")
+	optionsBar = Frame(root)
+	optionsBar.pack(side="top")
 	propertiesBar = Frame(root)
 	propertiesBar.pack(side="right")
 	main = Frame(root)
@@ -35,10 +67,10 @@ def setup():
 	canvas.pack()
 
 	# creating menu bar
-	Button(menuBar, text="Add", command=add).pack(side="left")
-	Button(menuBar, text="Edit", command=edit).pack(side="left")
-	Button(menuBar, text="Export", command=export).pack(side="left")
-	Button(menuBar, text="Render", command=None).pack(side="left")
+	Button(optionsBar, text="Add", command=add).pack(side="left")
+	Button(optionsBar, text="Edit", command=edit).pack(side="left")
+	Button(optionsBar, text="Export", command=export).pack(side="left")
+	Button(optionsBar, text="Render", command=None).pack(side="left")
 
 	# creating properties bar
 
@@ -112,7 +144,7 @@ def draw_line(point1, point2, selected=False):
 	canvas.create_line(point1.get(0), point1.get(1), point2.get(0), point2.get(1), fill=selectedColor if selected else defaultColor)
 
 def add():
-	lis = Listbox(menuBar)
+	lis = Listbox(optionsBar)
 	lis.insert(0, "Cube")
 	lis.insert(1, "Cube")
 	lis.insert(2, "Sphere")
