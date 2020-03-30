@@ -163,3 +163,13 @@ def add(obj):
 	model = getattr(m.model, obj)()
 	main.scene.addModel(model)
 	r.render(main.scene)
+
+def updateProperties(model):
+	if model:
+		props = [model.getPosition(), model.getRotation(), model.getScale()]
+	for i, frame in enumerate(propertiesBar.winfo_children()):
+		for j, prop in enumerate(frame.winfo_children()[1:]):
+			entry = prop.winfo_children()[1]
+			entry.delete(0, 10)
+			if model:
+				entry.insert(0, props[i].get(j))

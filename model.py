@@ -2,10 +2,11 @@ import structs
 
 class object(object):
 
-	def __init__(self, name="", position=(0.0, 0.0, 0.0), rotation=(0.0, 0.0, 0.0)):
+	def __init__(self, name="", position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0)):
 		self._name = name
-		self._position = structs.vector(position[0], position[1], position[2])
-		self._rotation = structs.vector(rotation[0], rotation[1], rotation[2])
+		self._position = position
+		self._rotation = rotation
+		self._scale = scale
 
 	def getPosition(self):
 		return self._position
@@ -13,11 +14,17 @@ class object(object):
 	def getRotation(self):
 		return self._rotation
 
+	def getScale(self):
+		return self._scale
+
 	def translate(self, x=0.0, y=0.0, z=0.0):
 		self._position.translate(x, y, z)
 
 	def rotate(self, angle, axis):
 		self._rotation.rotate(angle, axis)
+
+	def scale(self, x=1.0, y=1.0, z=1.0):
+		self._scale.scale(x, y, z)
 
 	def __str__(self):
 		return self._name
@@ -25,7 +32,7 @@ class object(object):
 class model(object):
 
 	@classmethod
-	def cube(cls, position=(0.0, 0.0, 0.0), rotation=(0.0, 0.0, 0.0), material=(0.5, 0.5, 0.5, 1.0), size=1.0):
+	def cube(cls, position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0), material=(0.5, 0.5, 0.5, 1.0), size=1.0):
 		cube = model("Cube", position, rotation, material)
 
 		cube.createVertex(structs.vector(0.0, 0.0, 0.0))
@@ -46,7 +53,7 @@ class model(object):
 
 		return cube
 
-	def __init__(self, name="", position=(0.0, 0.0, 0.0), rotation=(0.0, 0.0, 0.0), material=(0.5, 0.5, 0.5, 1.0)):
+	def __init__(self, name="", position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0), material=(0.5, 0.5, 0.5, 1.0)):
 		object.__init__(self, name, position, rotation)
 		self._vertices = []
 		self._faces = []
@@ -102,7 +109,7 @@ class model(object):
 
 class camera(object):
 
-	def __init__(self, position=(0.0, 0.0, 0.0), rotation=(0.0, 0.0, 0.0), perspective=True, focalLength=60, nearPlane=1.0, farPlane=2000.0):
+	def __init__(self, position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0), perspective=True, focalLength=60, nearPlane=1.0, farPlane=2000.0):
 		object.__init__(self, "Camera", position, rotation)
 		self._perspective = perspective
 		self._focalLength = focalLength

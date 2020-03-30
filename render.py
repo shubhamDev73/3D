@@ -97,6 +97,7 @@ def select(event):
 		if sameSide(v0, v1, v2, clickPoint) and sameSide(v1, v2, v0, clickPoint) and sameSide(v2, v0, v1, clickPoint):
 			selected = model
 			break
+	ui.updateProperties(selected)
 	render(scene)
 
 def export(file):

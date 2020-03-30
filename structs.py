@@ -85,6 +85,10 @@ class vector:
 		self._vector = rotate(self._vector, angle, axis)
 		return self._vector
 
+	def scale(self, x=1.0, y=1.0, z=1.0):
+		self._vector = scale(self._vector, x, y, z)
+		return self._vector
+
 	def toList(self):
 		return [self.get(0), self.get(1), self.get(2)]
 
