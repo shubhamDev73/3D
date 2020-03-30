@@ -45,7 +45,8 @@ Then, open `webgl.html` page using a web browser which supports WebGL, to see th
    - Implement rotation transformation.
    - Correctly use the u, v, n vectors used in projection matrix.
    - Implement visible surface detection algorithms to clip models and display only those parts which are in front.
-   - Improve the UI to incorporate model properties, model transformation and model editing options.
+   - Add color selection to model and individual faces
+   - Incorporate model editing options.
    - Add lights and export them in correct format.
    - Implement rendering algorithm.
 
