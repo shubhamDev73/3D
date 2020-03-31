@@ -29,7 +29,7 @@ class matrix:
 			for i in range(4):
 				value = 0.0
 				for k in range(4):
-					value += self.get(i, k) * other.get(k)
+					value += self.get(i, k) *  other.get(k)
 				result.insert(i, value)
 			return result
 		else:
@@ -85,19 +85,34 @@ class vector:
 	def insert(self, index, element):
 		return self._vector.insert(index, 0, element)
 
-	# def translate(self, x=0.0, y=0.0, z=0.0):
-	# 	self._vector = translate(self._vector, x, y, z)
-	# 	return self._vector
+	def translate(self, positionVector, commit=True):
+		if commit:
+			self._vector = translate(self, positionVector).asMatrix()
+			return self
+		else:
+			return translate(self, positionVector)
 
-	# def rotate(self, angle, axis):
-	# 	self._vector = rotate(self._vector, angle, axis)
-	# 	return self._vector
+	def rotate(self, rotationVector, commit=True):
+		if commit:
+			self._vector = rotate(self, rotationVector).asMatrix()
+			return self
+		else:
+			return rotate(self, rotationVector)
 
-	# def scale(self, x=1.0, y=1.0, z=1.0):
-	# 	self._vector = scale(self._vector, x, y, z)
-	# 	return self._vector
+	def scale(self, scaleVector, commit=True):
+		if commit:
+			self._vector = scale(self, scaleVector).asMatrix()
+			return self
+		else:
+			return scale(self, scaleVector)
 
-	def toList(self):
+	def asMatrix(self):
+		m = matrix(4, 1)
+		for i in range(4):
+			m.insert(i, 0, self.get(i))
+		return m
+
+	def asList(self):
 		return [self.get(0), self.get(1), self.get(2)]
 
 	def __add__(self, other):
@@ -121,22 +136,22 @@ class vector:
 	def __str__(self):
 		return "({}, {}, {})".format(self.get(0), self.get(1), self.get(2))
 
-def translate(vector, position=vector()):
-	return vector + position
+def translate(vector, positionVector=vector()):
+	return vector + positionVector
 
-def rotate(vector, rotation=vector()):
+def rotate(vector, rotationVector=vector()):
 	for i in range(3):
 		r = matrix.identity(4)
-		r.insert((i + 1) % 3, (i + 1) % 3, math.cos(math.radians(rotation.get(i))))
-		r.insert((i + 1) % 3, (i + 2) % 3, - math.sin(math.radians(rotation.get(i))))
-		r.insert((i + 2) % 3, (i + 1) % 3, math.sin(math.radians(rotation.get(i))))
-		r.insert((i + 2) % 3, (i + 2) % 3, math.cos(math.radians(rotation.get(i))))
+		r.insert((i + 1) % 3, (i + 1) % 3, math.cos(math.radians(rotationVector.get(i))))
+		r.insert((i + 1) % 3, (i + 2) % 3, - math.sin(math.radians(rotationVector.get(i))))
+		r.insert((i + 2) % 3, (i + 1) % 3, math.sin(math.radians(rotationVector.get(i))))
+		r.insert((i + 2) % 3, (i + 2) % 3, math.cos(math.radians(rotationVector.get(i))))
 		vector = r * vector
 	return vector
 
-def scale(vector, scale=vector(1.0, 1.0, 1.0)):
+def scale(vector, scaleVector=vector(1.0, 1.0, 1.0)):
 	s = matrix.identity(4)
-	s.insert(0, 0, scale.get(0))
-	s.insert(1, 1, scale.get(1))
-	s.insert(2, 2, scale.get(2))
+	s.insert(0, 0, scaleVector.get(0))
+	s.insert(1, 1, scaleVector.get(1))
+	s.insert(2, 2, scaleVector.get(2))
 	return s * vector

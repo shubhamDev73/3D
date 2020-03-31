@@ -86,6 +86,9 @@ class model(object):
 	def getFaces(self):
 		return self._faces
 
+	def getWorldCoordinates(self, vertex):
+		return self._vertices[vertex].rotate(self._rotation, False).scale(self._scale, False).translate(self._position, False)
+
 	def createVertex(self, position):
 		self._vertices.append(position)
 		self._numVertices += 1
@@ -127,6 +130,37 @@ class camera(object):
 
 	def getFarPlane(self):
 		return self._farPlane
+
+	def getViewCoordinates(self, worldCoordinates):
+		# TODO: implement rotation, fill u, v, n
+		u = structs.vector.direction(0) * -1
+		v = structs.vector.direction(2) * -1
+		n = structs.vector.direction(1)
+
+		r = structs.matrix.identity(4)
+		for i in range(3):
+			r.insert(0, i, u.get(i))
+			r.insert(1, i, v.get(i))
+			r.insert(2, i, n.get(i))
+		return r * worldCoordinates.translate(self._position * -1)
+
+	def project(self, viewCoordinates):
+		if self._perspective:
+			p = structs.matrix.identity(4)
+			# zv = self.getPosition().get(2)
+			# zp = self.getPosition().get(2) - self.getFocalLength()
+			# d = zp - zv
+			# p.insert(2, 2, zv / d)
+			# p.insert(2, 3, -zv * (zp / d))
+			# p.insert(3, 2, 1.0 / d)
+			# p.insert(3, 3, -zp / d)
+			p.insert(2, 2, 0)
+			p.insert(3, 2, -1.0 / self._focalLength)
+			p.insert(3, 3, -1.0)
+			v = p * viewCoordinates
+			return structs.vector(v.get(0) / v.get(3), v.get(1) / v.get(3))
+		else:
+			return structs.vector(viewCoordinates.get(0), viewCoordinates.get(1))
 
 	def setPerspective(self, perspective):
 		self._perspective = perspective
