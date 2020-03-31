@@ -1,9 +1,9 @@
-import model as m, scene as s, render as r, ui
+""" Starting point for running the program """
+
+import scene as s, render as r, ui
 
 scene = s.scene()
 
 if __name__ == "__main__":
 
-	ui.setup()
-	r.render(scene)
-	ui.start()
+	ui.start(ui.setup())

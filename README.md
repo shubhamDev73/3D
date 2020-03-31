@@ -26,7 +26,7 @@ Then, open `webgl.html` page using a web browser which supports WebGL, to see th
 
 1. 3D modelling sub-system
    - **\_\_init\_\_.py** : to mark the folder and python files present in it as modules.
-   - **structs.py** : defines matrix and vector classes and common transformations used (such as translate, rotate and scale).
+   - **structs.py** : defines matrix and vector classes.
    - **model.py** : defines the object class which is base class for any object present in the scene. Also defines model and camera classes which are a special case of the object class, and hence inherit from it.
    - **scene.py** : defines the scene class which contains the entire 3D scene. It contains 1 camera to render the scene and a list of all models present in it.
    - **render.py** : does transformations and projections so that all the models present in the scene can be viewed on the canvas defined in `ui.py`.
@@ -42,11 +42,11 @@ Then, open `webgl.html` page using a web browser which supports WebGL, to see th
 ## TO DO
 
 1. 3D modelling sub-system
-   - Implement rotation transformation.
-   - Correctly use the u, v, n vectors used in projection matrix.
+   - Implement camera rotation and hence correctly use the u, v, n vectors used in projection matrix.
    - Implement visible surface detection algorithms to clip models and display only those parts which are in front.
-   - Add color selection to model and individual faces
    - Incorporate model editing options.
+   - Implement material as a different class rather than a tuple of color values.
+   - Add material selection to model and individual faces.
    - Add lights and export them in correct format.
    - Implement rendering algorithm.
 

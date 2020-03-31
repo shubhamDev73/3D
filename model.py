@@ -1,8 +1,12 @@
+""" Implements all the physical objects used """
+
 import structs
 
 class object:
 
-	def __init__(self, name="", position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0)):
+	""" The object class which is base class for every object(3D model, camera, light, etc.) """
+
+	def __init__(self, name="", position=structs.vector(), rotation=structs.vector(), scale=structs.vector.one()):
 		self._name = name
 		self._position = position
 		self._rotation = rotation
@@ -19,41 +23,57 @@ class object:
 
 	def setPosition(self, x=0.0, y=0.0, z=0.0):
 		self._position = structs.vector(x, y, z)
+		return self
 
 	def setRotation(self, x=0.0, y=0.0, z=0.0):
 		self._rotation = structs.vector(x, y, z)
+		return self
 
 	def setScale(self, x=1.0, y=1.0, z=1.0):
 		self._scale = structs.vector(x, y, z)
+		return self
 
 	def __str__(self):
 		return self._name
 
 class model(object):
 
+	""" The class defining 3D models """
+
+	# Pre-defined 3D models as classmethods
+
 	@classmethod
-	def cube(cls, name="Cube", position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0), material=(0.5, 0.5, 0.5, 1.0), size=1.0):
+	def cube(cls, name="Cube", position=structs.vector(), rotation=structs.vector(), scale=structs.vector.one(), material=(0.5, 0.5, 0.5, 1.0), size=1.0):
 		cube = cls(name, position, rotation, material)
 
+		# bottom vertices
 		cube.createVertex(structs.vector(-size/2, -size/2, -size/2))
 		cube.createVertex(structs.vector(size/2, -size/2, -size/2))
 		cube.createVertex(structs.vector(size/2, size/2, -size/2))
 		cube.createVertex(structs.vector(-size/2, size/2, -size/2))
+
+		# top vertices
 		cube.createVertex(structs.vector(-size/2, -size/2, size/2))
 		cube.createVertex(structs.vector(size/2, -size/2, size/2))
 		cube.createVertex(structs.vector(size/2, size/2, size/2))
 		cube.createVertex(structs.vector(-size/2, size/2, size/2))
 
+
+		# bottom face
 		cube.createFace(3, 2, 1, 0)
+
+		# side faces
 		cube.createFace(0, 1, 5, 4)
 		cube.createFace(1, 2, 6, 5)
 		cube.createFace(2, 3, 7, 6)
 		cube.createFace(3, 0, 4, 7)
+
+		# top face
 		cube.createFace(4, 5, 6, 7)
 
 		return cube
 
-	def __init__(self, name="", position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0), material=(0.5, 0.5, 0.5, 1.0)):
+	def __init__(self, name="", position=structs.vector(), rotation=structs.vector(), scale=structs.vector.one(), material=(0.5, 0.5, 0.5, 1.0)):
 		object.__init__(self, name, position, rotation)
 		self._vertices = []
 		self._faces = []
@@ -86,12 +106,10 @@ class model(object):
 	def getFaces(self):
 		return self._faces
 
-	def getWorldCoordinates(self, vertex):
-		return self._vertices[vertex].rotate(self._rotation, False).scale(self._scale, False).translate(self._position, False)
-
 	def createVertex(self, position):
 		self._vertices.append(position)
 		self._numVertices += 1
+		return self
 
 	def createFace(self, vertex1, vertex2, vertex3, vertex4=None, material=None):
 		if vertex1 < self._numVertices and vertex2 < self._numVertices and vertex3 < self._numVertices:
@@ -109,10 +127,17 @@ class model(object):
 				raise ValueError
 		else:
 			raise ValueError
+		return self
+
+	def getWorldCoordinates(self, vertex):
+		# First rotate, then scale, then translate
+		return self._vertices[vertex].rotate(self._rotation, False).scale(self._scale, False).translate(self._position, False)
 
 class camera(object):
 
-	def __init__(self, position=structs.vector(), rotation=structs.vector(), scale=structs.vector(1.0, 1.0, 1.0), perspective=True, focalLength=60, nearPlane=1.0, farPlane=2000.0):
+	""" The class defining the camera which renders scene """
+
+	def __init__(self, position=structs.vector(), rotation=structs.vector(), scale=structs.vector.one(), perspective=True, focalLength=60, nearPlane=1.0, farPlane=2000.0):
 		object.__init__(self, "Camera", position, rotation)
 		self._perspective = perspective
 		self._focalLength = focalLength
@@ -131,7 +156,26 @@ class camera(object):
 	def getFarPlane(self):
 		return self._farPlane
 
+	def setPerspective(self, perspective):
+		self._perspective = perspective
+		return self
+
+	def setFocalLength(self, focalLength):
+		self._focalLength = focalLength
+		return self
+
+	def setNearPlane(self, value):
+		self._nearPlane = value
+		return self
+
+	def setFarPlane(self, value):
+		self._farPlane = value
+		return self
+
+	# Viewing transformations
+
 	def getViewCoordinates(self, worldCoordinates):
+		# First translate, then rotate
 		# TODO: implement rotation, fill u, v, n
 		u = structs.vector.direction(0) * -1
 		v = structs.vector.direction(2) * -1
@@ -145,10 +189,13 @@ class camera(object):
 		return r * worldCoordinates.translate(self._position * -1)
 
 	def project(self, viewCoordinates):
+		# Projecting from 3D world to 2D window
 		if self._perspective:
+			# Perspective projection
+			# TODO: confirm this (specially self._focalLength)
 			p = structs.matrix.identity(4)
-			# zv = self.getPosition().get(2)
-			# zp = self.getPosition().get(2) - self.getFocalLength()
+			# zv = self._position().get(2)
+			# zp = self._position().get(2) - self._focalLength
 			# d = zp - zv
 			# p.insert(2, 2, zv / d)
 			# p.insert(2, 3, -zv * (zp / d))
@@ -160,16 +207,5 @@ class camera(object):
 			v = p * viewCoordinates
 			return structs.vector(v.get(0) / v.get(3), v.get(1) / v.get(3))
 		else:
+			# Orthogonal projection
 			return structs.vector(viewCoordinates.get(0), viewCoordinates.get(1))
-
-	def setPerspective(self, perspective):
-		self._perspective = perspective
-
-	def setFocalLength(self, focalLength):
-		self._focalLength = focalLength
-
-	def setNearPlane(self, value):
-		self._nearPlane = value
-
-	def setFarPlane(self, value):
-		self._farPlane = value
