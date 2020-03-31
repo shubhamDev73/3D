@@ -32,11 +32,7 @@ def render(_scene):
 			triangles.append((v0, v1, v2, model))
 
 def getWorldCoordinates(modelCoordinates, model):
-	position = model.getPosition()
-	# TODO: implement rotation
-	rotation = model.getRotation()
-	scale = model.getScale()
-	return structs.translate(structs.scale(modelCoordinates, scale.get(0), scale.get(1), scale.get(2)), position.get(0), position.get(1), position.get(2))
+	return structs.translate(structs.scale(structs.rotate(modelCoordinates, model.getRotation()), model.getScale()), model.getPosition())
 
 def getViewCoordinates(worldCoordinates, camera):
 	position = camera.getPosition()
@@ -51,7 +47,7 @@ def getViewCoordinates(worldCoordinates, camera):
 		r.insert(0, i, u.get(i))
 		r.insert(1, i, v.get(i))
 		r.insert(2, i, n.get(i))
-	return r * structs.translate(worldCoordinates, -position.get(0), -position.get(1), -position.get(2))
+	return r * structs.translate(worldCoordinates, position * -1)
 
 def project(viewCoordinates, camera):
 	if camera.isPerspective():
@@ -74,11 +70,8 @@ def project(viewCoordinates, camera):
 def getViewportCoordinates(projectionCoordinates, min_window, max_window, min_viewport, max_viewport):
 	x = (max_viewport.get(0) - min_viewport.get(0)) / (max_window.get(0) - min_window.get(0))
 	y = (max_viewport.get(1) - min_viewport.get(1)) / (max_window.get(1) - min_window.get(1))
-	return structs.translate(
-		structs.scale(
-			structs.translate(projectionCoordinates, -min_window.get(0), -min_window.get(1)), 
-			x=x, y=y), 
-		min_viewport.get(0), min_viewport.get(1))
+	s = structs.vector(x, y, 0.0)
+	return structs.translate(structs.scale(structs.translate(projectionCoordinates, min_window * -1), s), min_viewport)
 
 def sameSide(point1, point2, referencePoint, checkPoint):
 	if point2.get(0) == point1.get(0):
@@ -117,7 +110,7 @@ def export(file):
 	index = 0
 	for face in model.getFaces():
 		for vertex in face:
-			vertices += structs.translate(t * getWorldCoordinates(model.getVertex(vertex), model) / scene.getWorldSize(), -1, -1).toList()
+			vertices += structs.translate(t * getWorldCoordinates(model.getVertex(vertex), model) / scene.getWorldSize(), structs.vector(-1, -1, 0)).toList()
 			indices.append(index)
 			colors += list(model.getMaterial((int)(index / 3)))
 			index += 1

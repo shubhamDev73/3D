@@ -1,3 +1,5 @@
+import math
+
 class matrix:
 
 	@classmethod
@@ -74,23 +76,35 @@ class vector:
 	def get(self, index):
 		return self._vector.get(index, 0)
 
+	def getMagnitude(self):
+		return math.sqrt(math.pow(self._vector.get(0), 2) + math.pow(self._vector.get(1), 2) + math.pow(self._vector.get(2), 2))
+
+	def normalized(self):
+		return self._vector / self.getMagnitude()
+
 	def insert(self, index, element):
 		return self._vector.insert(index, 0, element)
 
-	def translate(self, x=0.0, y=0.0, z=0.0):
-		self._vector = translate(self._vector, x, y, z)
-		return self._vector
+	# def translate(self, x=0.0, y=0.0, z=0.0):
+	# 	self._vector = translate(self._vector, x, y, z)
+	# 	return self._vector
 
-	def rotate(self, angle, axis):
-		self._vector = rotate(self._vector, angle, axis)
-		return self._vector
+	# def rotate(self, angle, axis):
+	# 	self._vector = rotate(self._vector, angle, axis)
+	# 	return self._vector
 
-	def scale(self, x=1.0, y=1.0, z=1.0):
-		self._vector = scale(self._vector, x, y, z)
-		return self._vector
+	# def scale(self, x=1.0, y=1.0, z=1.0):
+	# 	self._vector = scale(self._vector, x, y, z)
+	# 	return self._vector
 
 	def toList(self):
 		return [self.get(0), self.get(1), self.get(2)]
+
+	def __add__(self, other):
+		result = vector()
+		for i in range(3):
+			result.insert(i, self.get(i) + other.get(i))
+		return result
 
 	def __mul__(self, num):
 		v = vector()
@@ -107,20 +121,22 @@ class vector:
 	def __str__(self):
 		return "({}, {}, {})".format(self.get(0), self.get(1), self.get(2))
 
-def translate(vector, x=0.0, y=0.0, z=0.0):
-	t = matrix.identity(4)
-	t.insert(0, 3, x)
-	t.insert(1, 3, y)
-	t.insert(2, 3, z)
-	return t * vector
+def translate(vector, position=vector()):
+	return vector + position
 
-def rotate(vector, angle, axis):
-	# TODO
+def rotate(vector, rotation=vector()):
+	for i in range(3):
+		r = matrix.identity(4)
+		r.insert((i + 1) % 3, (i + 1) % 3, math.cos(math.radians(rotation.get(i))))
+		r.insert((i + 1) % 3, (i + 2) % 3, - math.sin(math.radians(rotation.get(i))))
+		r.insert((i + 2) % 3, (i + 1) % 3, math.sin(math.radians(rotation.get(i))))
+		r.insert((i + 2) % 3, (i + 2) % 3, math.cos(math.radians(rotation.get(i))))
+		vector = r * vector
 	return vector
 
-def scale(vector, x=1.0, y=1.0, z=1.0):
+def scale(vector, scale=vector(1.0, 1.0, 1.0)):
 	s = matrix.identity(4)
-	s.insert(0, 0, x)
-	s.insert(1, 1, y)
-	s.insert(2, 2, z)
+	s.insert(0, 0, scale.get(0))
+	s.insert(1, 1, scale.get(1))
+	s.insert(2, 2, scale.get(2))
 	return s * vector
