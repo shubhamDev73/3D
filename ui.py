@@ -1,17 +1,20 @@
 """ Creates the user interface """
 
-import structs, model as m, render as r, main
+import structs, model, render, main
 
 from tkinter import *
 from tkinter.ttk import *
 from tkinter import filedialog
 
 # Global variables
+# canvas: where the scene is drawn
+# svs: string vars for property entry boxes
+# prevVals: previous values of properties for rollback on invalid entry
 
 viewportSize = 512
+canvas = None
 svs = []
 prevVals = [0 for i in range(9)]
-canvas = None
 
 # Color to display model in
 selectedColor = "red"
@@ -40,25 +43,24 @@ def setup():
 	fileMenu.add_command(label="New", command=None)
 	fileMenu.add_command(label="Open", command=None)
 	fileMenu.add_command(label="Save", command=None)
-	fileMenu.add_command(label="Save as...", command=None)
-	fileMenu.add_command(label="Close", command=None)
+	fileMenu.add_command(label="Save As...", command=None)
 	fileMenu.add_separator()
 	fileMenu.add_command(label="Exit", command=root.quit)
 	menuBar.add_cascade(label="File", menu=fileMenu)
 
 	editMenu = Menu(menuBar, tearoff=0)
 	editMenu.add_command(label="Undo", command=None)
+	editMenu.add_command(label="Redo", command=None)
 	editMenu.add_separator()
 	editMenu.add_command(label="Cut", command=None)
 	editMenu.add_command(label="Copy", command=None)
 	editMenu.add_command(label="Paste", command=None)
 	editMenu.add_command(label="Delete", command=None)
-	editMenu.add_command(label="Select All", command=None)
 	menuBar.add_cascade(label="Edit", menu=editMenu)
 
 	helpMenu = Menu(menuBar, tearoff=0)
-	helpMenu.add_command(label="Help Index", command=None)
-	helpMenu.add_command(label="About...", command=None)
+	helpMenu.add_command(label="Help", command=None)
+	helpMenu.add_command(label="About", command=None)
 	menuBar.add_cascade(label="Help", menu=helpMenu)
 
 	root.config(menu=menuBar)
@@ -73,9 +75,8 @@ def setup():
 	mainWindow.pack(side="bottom")
 
 
-	# canvas is where the model will be shown
 	canvas = Canvas(mainWindow, width=viewportSize, height=viewportSize)
-	canvas.bind('<Button-1>', r.select)
+	canvas.bind('<Button-1>', render.select)
 	canvas.pack()
 
 
@@ -85,10 +86,10 @@ def setup():
 	addMenubutton = Menubutton(optionsBar, text="Add")
 	addMenu = Menu(addMenubutton, tearoff=0)
 
-	# List of all classmethods in model.model (these are all pre-defined 3D models)
-	objects = [method for method in dir(m.model) if type(getattr(m.model, method)) is type(m.model.cube)]
-	for obj in objects:
-		addMenu.add_command(label=obj.capitalize(), command=lambda obj=obj : add(obj))
+	# Adding all classmethods present in model.model (these are all pre-defined 3D models)
+	for method in dir(model.model):
+		if type(getattr(model.model, method)) is type(model.model.cube):
+			addMenu.add_command(label=method.capitalize(), command=lambda modelType=method : add(modelType))
 
 	# Placeholder for lights
 	addMenu.add_separator()
@@ -150,15 +151,15 @@ def draw_line(point1, point2, selected=False):
 	canvas.create_line(point1.get(0), point1.get(1), point2.get(0), point2.get(1), fill=selectedColor if selected else defaultColor)
 	return canvas
 
-def add(model):
+def add(modelType):
 
 	""" Adds a new model to the scene and selects it """
 
-	createdModel = getattr(m.model, model)()
+	createdModel = getattr(model.model, modelType)()
 	main.scene.addModel(createdModel)
-	r.selected = createdModel
+	render.selected = createdModel
 	updateProperties(createdModel)
-	r.display(main.scene)
+	render.display(main.scene)
 	return createdModel
 
 def setSvs():
@@ -166,7 +167,7 @@ def setSvs():
 	""" Updates svs """
 
 	for i in range(9):
-		svs[i].set(str(prevVals[i]) if r.selected else "")
+		svs[i].set(str(prevVals[i]) if render.selected else "")
 	return svs
 
 def setPrevVals():
@@ -177,29 +178,29 @@ def setPrevVals():
 		prevVals[i] = float(svs[i].get())
 	return prevVals
 
-def updateProperties(model):
+def updateProperties(obj):
 
-	""" Updates displayed properties for the model """
+	""" Updates displayed properties for the obj """
 
-	if model:
-		props = [model.getPosition(), model.getRotation(), model.getScale()]
+	if obj:
+		props = (obj.getPosition(), obj.getRotation(), obj.getScale())
 
 	# Getting correct entry box stringvar to update
 	for i in range(3):
 		for j in range(3):
-			svs[i * 3 + j].set(str(props[i].get(j)) if model else "")
+			svs[i * 3 + j].set(str(props[i].get(j)) if obj else "")
 
-	if model:
+	if obj:
 		setPrevVals()
 
-	return props if model else None
+	return props if obj else None
 
 def transform(sv, prop, axis):
 
 	""" Transforms selected model based on updated value of sv """
 
 	valid = True
-	if r.selected is None:
+	if render.selected is None:
 		valid = False
 
 	try:
@@ -214,8 +215,8 @@ def transform(sv, prop, axis):
 
 	vector = [float(svs[prop * 3 + i].get()) for i in range(3)]
 	vector[axis] = val
-	getattr(r.selected, "set{}".format(("Position", "Rotation", "Scale")[prop]))(*vector)
-	r.display(main.scene)
+	getattr(render.selected, "set{}".format(("Position", "Rotation", "Scale")[prop]))(*vector)
+	render.display(main.scene)
 	setPrevVals()
 	# Display in correct notation (1.0 instead of 1)
 	setSvs()
@@ -226,12 +227,12 @@ def export():
 
 	""" Opens file dialog to select file and calls render.export function """
 
-	if r.selected is None:
+	if render.selected is None:
 		return
 
 	file = filedialog.asksaveasfilename(initialdir="./", title="Export model", initialfile="model.js", filetypes=[('Javascript files', '*.js')])
 	if file:
 		# Save in js format only
-		r.export(file if file[-3:] == ".js" else file + ".js")
+		render.export(file if file[-3:] == ".js" else file + ".js")
 
 	return file

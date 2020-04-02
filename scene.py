@@ -1,6 +1,6 @@
 """ Implements the 3D scene """
 
-import model as m
+import model
 
 class scene:
 
@@ -8,7 +8,7 @@ class scene:
 
 	def __init__(self, worldSize=5):
 		self._models = []
-		self._camera = m.camera()
+		self._camera = model.camera()
 		self._worldSize = worldSize
 
 	def getCamera(self):
@@ -24,6 +24,6 @@ class scene:
 		self._worldSize = worldSize
 		return self
 
-	def addModel(self, model):
-		self._models.append(model)
+	def addModel(self, createdModel):
+		self._models.append(createdModel)
 		return self

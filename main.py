@@ -1,8 +1,8 @@
 """ Starting point for running the program """
 
-import scene as s, render as r, ui
+import scene, ui
 
-scene = s.scene()
+scene = scene.scene()
 
 if __name__ == "__main__":
 

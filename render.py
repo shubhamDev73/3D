@@ -1,25 +1,20 @@
 """ Implements the display and render algorithms """
 
-import structs, ui
+import structs, ui, main
 
 # Global variables contains reference assigned by latest call (used while updating in this module)
-# scene: scene to display
 # triangles: list of triangles (viewport coordinates) and their corresponding model to calculate selected model
 # selected: reference to the model that is currently selected
 
-scene = None
 triangles = []
 selected = None
 
-def display(_scene):
+def display(scene):
 
 	""" Displays the scene on UI """
 
-	if _scene is None:
-		return
+	global triangles
 
-	global scene, triangles
-	scene = _scene
 	camera = scene.getCamera()
 
 	# Window: bottom-left is (0, 0)
@@ -35,8 +30,8 @@ def display(_scene):
 	for model in scene.getModels():
 		for face in model.getFaces():
 			# Model coordinates -> world coordinates -> view coordinates -> projection coordinates -> viewport coordinates
-			projection = (camera.project(camera.getViewCoordinates(model.getWorldCoordinates(face[i]))) for i in range(3))
-			projection = tuple(map(lambda vector: getViewportCoordinates(vector, min_window, max_window, min_viewport, max_viewport), projection))
+			projection = [camera.project(camera.getViewCoordinates(model.getWorldCoordinates(face[i]))) for i in range(3)]
+			projection = list(map(lambda vector: getViewportCoordinates(vector, min_window, max_window, min_viewport, max_viewport), projection))
 			ui.draw_line(projection[0], projection[1], selected is model)
 			ui.draw_line(projection[1], projection[2], selected is model)
 			triangles.append((projection[0], projection[1], projection[2], model))
@@ -62,6 +57,7 @@ def select(event):
 
 	global selected
 	selected = None
+
 	clickPoint = structs.vector(event.x, event.y)
 	for v0, v1, v2, model in triangles:
 		# For line created by each cyclic pair v0, v1 if v2 and click point lie on same side of line, then clicked on that model
@@ -69,7 +65,7 @@ def select(event):
 			selected = model
 			break
 	ui.updateProperties(selected)
-	display(scene)
+	display(main.scene)
 	return selected
 
 def sameSide(point1, point2, referencePoint, checkPoint):
@@ -104,7 +100,7 @@ def export(file):
 
 	# This program: (0, 0, 0) to (worldSize, worldSize, worldSize)
 	min_window = structs.vector()
-	max_window = structs.vector.one() * scene.getWorldSize()
+	max_window = structs.vector.one() * main.scene.getWorldSize()
 	# For WebGL: (-1, -1, -1) to (1, 1, 1)
 	min_viewport = structs.vector.one() * -1
 	max_viewport = structs.vector.one()

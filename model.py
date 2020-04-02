@@ -78,27 +78,16 @@ class model(object):
 		self._vertices = []
 		self._faces = []
 		self._materials = []
-		self._numVertices = 0
-		self._numFaces = 0
 		self._material = material
 
 	def getVertex(self, vertex):
-		if vertex < self._numVertices:
-			return self._vertices[vertex]
-		else:
-			raise ValueError
+		return self._vertices[vertex]
 
 	def getFace(self, face):
-		if face < self._numFaces:
-			return self._faces[face]
-		else:
-			raise ValueError
+		return self._faces[face]
 
 	def getMaterial(self, material):
-		if material < self._numFaces:
-			return self._materials[material]
-		else:
-			raise ValueError
+		return self._materials[material]
 
 	def getVertices(self):
 		return self._vertices
@@ -108,21 +97,19 @@ class model(object):
 
 	def createVertex(self, position):
 		self._vertices.append(position)
-		self._numVertices += 1
 		return self
 
 	def createFace(self, vertex1, vertex2, vertex3, vertex4=None, material=None):
-		if vertex1 < self._numVertices and vertex2 < self._numVertices and vertex3 < self._numVertices:
+		numVertices = len(self._vertices)
+		if vertex1 < numVertices and vertex2 < numVertices and vertex3 < numVertices:
 			if vertex4 is None:
 				self._faces.append((vertex1, vertex2, vertex3))
 				self._materials.append(self._material if material is None else material)
-				self._numFaces += 1
-			elif vertex4 < self._numVertices:
+			elif vertex4 < numVertices:
 				self._faces.append((vertex1, vertex2, vertex3))
 				self._faces.append((vertex3, vertex4, vertex1))
 				self._materials.append(self._material if material is None else material)
 				self._materials.append(self._material if material is None else material)
-				self._numFaces += 2
 			else:
 				raise ValueError
 		else:
